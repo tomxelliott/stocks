@@ -32,6 +32,8 @@ var stocks = []string{
 	"tsla",
 	"aapl",
 	"bbry",
+	"fb",
+	"amzn",
 	"hpq",
 	"vz",
 	"t",
@@ -40,23 +42,34 @@ var stocks = []string{
 }
 
 func main() {
+	defer fmt.Println("Stocks application closing...")
 	numComplete := 0
-	for _, symbol := range stocks {
-		go func(symbol string) {
-			resp, _ := http.Get("http://dev.markitondemand.com/MODApis/Api/v2/Quote?symbol=" + symbol)
-			defer resp.Body.Close()
-			body, _ := ioutil.ReadAll(resp.Body)
-
-			quote := new(QuoteResponse)
-			xml.Unmarshal(body, &quote)
-
-			fmt.Printf("%s: %.2f\n", quote.Name, quote.LastPrice)
-			numComplete++
-		}(symbol)
+	loc, err := time.LoadLocation("Europe/London")
+	if err != nil {
+		fmt.Println(err.Error())
+		return
 	}
+	for {
+		t := time.Now()
+		fmt.Println("Stock prices", t.In(loc).Format("02/01/06 03:04:05 PM"))
+		for _, symbol := range stocks {
+			go func(symbol string) {
+				resp, _ := http.Get("http://dev.markitondemand.com/MODApis/Api/v2/Quote?symbol=" + symbol)
+				defer resp.Body.Close()
+				body, _ := ioutil.ReadAll(resp.Body)
 
-	// Ensure computation is carried out before main goroutine terminates
-	for numComplete < len(stocks) {
-		time.Sleep(10 * time.Millisecond)
+				quote := new(QuoteResponse)
+				xml.Unmarshal(body, &quote)
+
+				fmt.Printf("%s: %.2f\n", quote.Name, quote.LastPrice)
+				numComplete++
+			}(symbol)
+		}
+
+		// Ensure computation is carried out before main goroutine terminates
+		for numComplete < len(stocks) {
+			time.Sleep(10 * time.Millisecond)
+		}
+		time.Sleep(15 * time.Minute)
 	}
 }
