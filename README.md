@@ -8,14 +8,13 @@ I want to develop a basic front end for this and have the API be called every mi
 
 To build image:
 
-(Note - I will streamline this image so that it uses less memory by using *FROM scratch* instead of the current method which bundles the Go runtime into the Docker image which isn't necessary for this application and leads to a bloated image.)
-
 ```
-docker build -t stocks .
+$ CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+$ docker build -t stocks -f Dockerfile .
 ```
 
 Then to run:
 
 ```
-docker run stocks
+docker run -it stocks
 ```
