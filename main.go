@@ -44,14 +44,9 @@ var stocks = []string{
 func main() {
 	defer fmt.Println("Stocks application closing...")
 	numComplete := 0
-	loc, err := time.LoadLocation("Europe/London")
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
 	for {
 		t := time.Now()
-		fmt.Println("Stock prices", t.In(loc).Format("02/01/06 03:04:05 PM"))
+		fmt.Println("Stock prices", t.Format("02/01/06 03:04:05 PM"))
 		for _, symbol := range stocks {
 			go func(symbol string) {
 				resp, _ := http.Get("http://dev.markitondemand.com/MODApis/Api/v2/Quote?symbol=" + symbol)
