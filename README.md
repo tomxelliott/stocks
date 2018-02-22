@@ -16,5 +16,5 @@ $ docker build -t stocks -f Dockerfile .
 Then to run:
 
 ```
-docker run -it stocks
+$ docker run -it stocks
 ```
